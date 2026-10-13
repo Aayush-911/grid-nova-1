@@ -1061,15 +1061,18 @@ let charts = {};
 
 function currentSite(){
   const base = SITES.find(s=>s.id===STATE.siteId) || SITES[0];
-  if(STATE.dataMode!=='firebase' || !STATE.firebaseData) return base;
-  const d=STATE.firebaseData;
-  return {...base,
-    solar: finiteOr(d.solarKw, base.solar),
-    load: finiteOr(d.loadKw, base.load),
-    battery: finiteOr(d.batterySoc, base.battery),
-    grid: finiteOr(d.gridKw, base.grid ?? 11.4),
-    solarCap: finiteOr(d.solarCapacityKw, base.solarCap)
-  };
+  // In Live Firebase mode, never fall back to prototype readings.
+  if(STATE.dataMode==='firebase'){
+    const d=STATE.firebaseData || {};
+    return {...base,
+      solar: finiteOr(d.solarKw, 0),
+      load: finiteOr(d.loadKw, 0),
+      battery: finiteOr(d.batterySoc, 0),
+      grid: finiteOr(d.gridKw, 0),
+      solarCap: finiteOr(d.solarCapacityKw, 0)
+    };
+  }
+  return base;
 }
 function finiteOr(value, fallback){ const n=Number(value); return value!==null && value!=='' && Number.isFinite(n) ? n : fallback; }
 function liveNodes(){
@@ -1077,7 +1080,10 @@ function liveNodes(){
     if(STATE.anomaly && n.id==='S03' && STATE.dataMode==='prototype'){ return {...n, ...NODE_ANOMALY_OVERRIDE}; }
     return {...n};
   });
-  if(STATE.dataMode!=='firebase' || !Array.isArray(STATE.firebaseNodes)) return baseNodes;
+  if(STATE.dataMode==='firebase' && !Array.isArray(STATE.firebaseNodes)){
+    return baseNodes.map(n=>({...n,power:0,expected:0,voltage:0,current:0,temp:0,health:0,status:'offline'}));
+  }
+  if(STATE.dataMode!=='firebase') return baseNodes;
   return baseNodes.map(n=>{
     const incoming=STATE.firebaseNodes.find(x=>String(x.id||x.nodeId||'').toUpperCase()===n.id);
     if(!incoming) return n;
@@ -1369,7 +1375,7 @@ function renderAppShell(){
           </div>
           <div class="source-status ${STATE.firebaseConnected?'connected':''}"><span class="dot"></span>${STATE.firebaseConnected?'Firebase connected':(STATE.firebaseError?'Firebase error':'Firebase not connected')}</div>
         </div>
-        ${STATE.dataMode==='firebase' && !STATE.firebaseConnected ? `<div class="card card-pad" style="margin-bottom:16px;border-color:var(--orange);"><b>Live mode selected, but Firebase is not connected.</b><div class="card-sub" style="margin-top:5px;">Open Settings → Firebase Connection, paste your Firebase web config and Realtime Database URL, then connect. Prototype values are not presented as live values in this mode.</div>${STATE.firebaseError?`<div style="color:var(--red);font-size:12px;margin-top:6px;">${escapeHtml(STATE.firebaseError)}</div>`:''}</div>`:''}
+        ${STATE.dataMode==='firebase' && (!STATE.firebaseConnected || STATE.firebaseError) ? `<div class="card card-pad" style="margin-bottom:16px;border-color:var(--orange);"><b>${STATE.firebaseConnected ? 'Waiting for live sensor data' : 'Live mode selected, but Firebase is not connected.'}</b><div class="card-sub" style="margin-top:5px;">${STATE.firebaseConnected ? 'Dashboard values are set to 0 until sensor readings arrive.' : 'Open Settings → Firebase Connection and connect your Realtime Database.'} Prototype values are not presented as live values in this mode.</div>${STATE.firebaseError?`<div style="color:var(--red);font-size:12px;margin-top:6px;">${escapeHtml(STATE.firebaseError)}</div>`:''}</div>`:''}
         ${renderPageContent(STATE.page)}
       </div>
     </div>
@@ -1399,7 +1405,7 @@ function renderPageContent(page){
 /* ---------- DASHBOARD ---------- */
 function energyFlowBlock(){
   const site = currentSite();
-  const solar = site.solar, battery = 12.3, load = site.load, grid = 11.4;
+  const solar = site.solar, battery = STATE.dataMode==='firebase' ? finiteOr(STATE.firebaseData?.batteryKw, 0) : 12.3, load = site.load, grid = STATE.dataMode==='firebase' ? site.grid : 11.4;
   return `
   <div class="card card-pad">
     <div class="card-title-row"><div><div class="card-title">Energy Flow</div><div class="card-sub">Solar → Battery / Load → Grid</div></div>
@@ -1464,11 +1470,11 @@ function envBlock(){
   return `<div class="card card-pad">
     <div class="card-title">Environmental</div>
     <div style="display:flex; gap:22px; margin-top:12px; flex-wrap:wrap;">
-      <div class="flex items-center gap-2"><span style="color:var(--orange);">${ic('thermo')}</span><div><div style="font-weight:800; font-size:15px;">29°C</div><div style="font-size:11px; color:var(--text-faint);">Temperature</div></div></div>
-      <div class="flex items-center gap-2"><span style="color:var(--blue);">${ic('droplet')}</span><div><div style="font-weight:800; font-size:15px;">62%</div><div style="font-size:11px; color:var(--text-faint);">Humidity</div></div></div>
-      <div class="flex items-center gap-2"><span style="color:var(--text-secondary);">${ic('cloud')}</span><div><div style="font-weight:800; font-size:15px;">742 W/m²</div><div style="font-size:11px; color:var(--text-faint);">Irradiance</div></div></div>
+      <div class="flex items-center gap-2"><span style="color:var(--orange);">${ic('thermo')}</span><div><div style="font-weight:800; font-size:15px;">${STATE.dataMode==='firebase' ? finiteOr(STATE.firebaseData?.temperatureC,0)+'°C' : '29°C'}</div><div style="font-size:11px; color:var(--text-faint);">Temperature</div></div></div>
+      <div class="flex items-center gap-2"><span style="color:var(--blue);">${ic('droplet')}</span><div><div style="font-weight:800; font-size:15px;">${STATE.dataMode==='firebase' ? finiteOr(STATE.firebaseData?.humidityPct,0)+'%' : '62%'}</div><div style="font-size:11px; color:var(--text-faint);">Humidity</div></div></div>
+      <div class="flex items-center gap-2"><span style="color:var(--text-secondary);">${ic('cloud')}</span><div><div style="font-weight:800; font-size:15px;">${STATE.dataMode==='firebase' ? finiteOr(STATE.firebaseData?.irradianceWm2,0)+' W/m²' : '742 W/m²'}</div><div style="font-size:11px; color:var(--text-faint);">Irradiance</div></div></div>
     </div>
-    <div style="margin-top:10px; font-size:12px; color:var(--text-faint);">Partly Cloudy — used as an input to explain generation variance.</div>
+    <div style="margin-top:10px; font-size:12px; color:var(--text-faint);">${STATE.dataMode==='firebase' ? 'Live sensor input; missing fields display as 0.' : 'Partly Cloudy — used as an input to explain generation variance.'}</div>
   </div>`;
 }
 function renderDashboard(){
@@ -1497,8 +1503,8 @@ function renderDashboard(){
     </div>
     <div class="card kpi-card">
       <div class="kpi-top"><span class="kpi-label">Grid</span><div class="kpi-icon" style="background:var(--bg-soft); color:var(--text-secondary);">${ic('grid','icon-sm')}</div></div>
-      <div class="kpi-value">11.4 kW</div>
-      <div class="kpi-foot" style="color:var(--text-secondary);">Importing · Stable</div>
+      <div class="kpi-value">${STATE.dataMode==='firebase' ? site.grid : 11.4} kW</div>
+      <div class="kpi-foot" style="color:var(--text-secondary);">${STATE.dataMode==='firebase' ? (site.grid===0 ? 'No grid input' : 'Live reading') : 'Importing · Stable'}</div>
     </div>
   </div>
   <div class="two-col">
@@ -2022,7 +2028,12 @@ function connectFirebase(){
     STATE.firebaseRef.on('value', snapshot=>{
       const value=snapshot.val();
       if(!value || typeof value!=='object'){
-        STATE.firebaseConnected=false; STATE.firebaseError='No data found at path "'+path+'". Check the ESP32 write path and database rules.';
+        // A readable but empty path is treated as zero telemetry, not prototype data.
+        STATE.firebaseData={solarKw:0,loadKw:0,batterySoc:0,gridKw:0,solarCapacityKw:0,nodes:[]};
+        STATE.firebaseNodes=[];
+        STATE.firebaseLastUpdate=null;
+        STATE.firebaseConnected=true;
+        STATE.firebaseError='No sensor data at "'+path+'" yet. Showing 0 until the ESP32 sends readings.';
       } else {
         STATE.firebaseData=value;
         STATE.firebaseNodes=Array.isArray(value.nodes)?value.nodes:(value.nodes && typeof value.nodes==='object'?Object.entries(value.nodes).map(([id,v])=>({id,...v})):null);

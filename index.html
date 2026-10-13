@@ -658,6 +658,280 @@ table th{background:#292D26;color:#B9BAAF}table td{border-color:#45483E;color:#F
 @media(max-width:390px){.landing-nav-cta{font-size:9px}.hero-actions .btn{width:100%;justify-content:center}.hero-visual{height:370px}.capability-grid{grid-template-columns:1fr}.capability{min-height:245px}.preview-kpi strong{font-size:21px}.preview-mode{font-size:7px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
+
+/* =========================================================
+   GRIDNOVA — RESPONSIVE PATCH
+   Desktop, laptop, tablet, phone, landscape and touch screens
+   Keep this block AFTER the existing CSS so these rules win.
+   ========================================================= */
+html {
+  width: 100%;
+  max-width: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+img, svg, canvas, video, iframe {
+  max-width: 100%;
+}
+button, input, select, textarea {
+  max-width: 100%;
+}
+.page, .main-col, .preview-main, .card, .card-pad,
+.two-col > *, .three-col > *, .kpi-grid > * {
+  min-width: 0;
+}
+.page { width: 100%; margin-inline: auto; }
+.card, .map-card, .site-card, .data-source-bar,
+.preview-frame, .preview-chart, .preview-health { min-width: 0; }
+table { max-width: 100%; }
+.chart-wrap, .chart-wrap-sm { width: 100%; min-width: 0; }
+#screen-login, #screen-sites, #screen-app, .landing { max-width: 100%; }
+
+/* Large desktop / wide monitors */
+@media (min-width: 1441px) {
+  .page { width: 100%; }
+  .landing-nav, .hero, .preview-section, .capabilities, .how-section {
+    max-width: 1600px;
+  }
+}
+
+/* Laptop and landscape tablet */
+@media (min-width: 1001px) and (max-width: 1280px) {
+  :root { --sidebar-w: 220px; }
+  .page { padding: 22px 20px 48px; }
+  .kpi-grid { gap: 11px; }
+  .kpi-card { padding: 15px; }
+  .kpi-value { font-size: clamp(19px, 2vw, 23px); }
+  .two-col { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+  .hero { gap: 42px; }
+  .preview-main { padding: 18px; }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  #screen-app { min-height: 100dvh; }
+  .sidebar { z-index: 60; }
+  .topbar { min-width: 0; }
+  .topbar-right { min-width: 0; }
+  .page { padding: 20px 18px 42px; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two-col, .three-col { grid-template-columns: minmax(0, 1fr); }
+  .sites-grid-wrap { grid-template-columns: minmax(0, 1fr); }
+  .map-card { position: static; }
+  .site-card { min-width: 0; }
+  .site-metrics { gap: 18px; }
+  .alerts-table, .data-table { display: block; width: 100%; overflow-x: auto; }
+  .alerts-table table, .data-table table { min-width: 560px; }
+  .flow-row { gap: 14px; }
+  .flow-col { min-width: 76px; }
+  .modal-overlay { padding: 16px; }
+  .landing-nav { padding-inline: 4%; }
+  .hero { padding-inline: 4%; gap: 28px; }
+  .hero-visual { min-height: 360px; }
+  .preview-section, .capabilities, .how-section { padding-inline: 4%; }
+  .closing-cta { margin-inline: 4%; }
+}
+
+/* Phone and compact tablet: off-canvas navigation */
+@media (max-width: 720px) {
+  .sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(290px, 84vw);
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow-y: auto;
+    transform: translateX(-105%);
+    left: 0;
+    transition: transform .22s ease;
+    z-index: 100;
+    box-shadow: none;
+  }
+  .sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: 0 0 0 100vmax rgba(0,0,0,.52);
+  }
+  .sidebar.collapsed { width: min(290px, 84vw); }
+  .sidebar.collapsed .side-label,
+  .sidebar.collapsed .brand-text,
+  .sidebar.collapsed .op-text { display: flex; }
+  .main-col { width: 100%; min-width: 0; }
+  .topbar { position: sticky; top: 0; height: 58px; padding-inline: 12px; }
+  .crumb { min-width: 0; }
+  .topbar-right { gap: 6px; }
+  .site-select-btn { max-width: 125px; overflow: hidden; }
+  .page { padding: 16px 14px 36px; }
+  .page-head-row { align-items: flex-start; }
+  .page-head-row > * { min-width: 0; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .kpi-card { padding: 14px; }
+  .kpi-value { font-size: clamp(18px, 4.5vw, 23px); overflow-wrap: anywhere; }
+  .kpi-label, .kpi-foot { font-size: 11px; }
+  .card-pad { padding: 15px; }
+  .card-title-row { align-items: flex-start; }
+  .data-source-bar { align-items: flex-start; padding: 12px; }
+  .source-actions { display: flex; width: 100%; }
+  .source-btn { flex: 1 1 auto; min-width: 0; padding: 9px 8px; }
+  .site-card { align-items: stretch; }
+  .site-card > * { min-width: 0; }
+  .site-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .site-metric { min-width: 0; }
+  .flow-row { justify-content: center; }
+  .topology-row { width: 100%; }
+  .node-card { min-width: 0; }
+  .chart-wrap { height: 220px; }
+  .chart-wrap-sm { height: 165px; }
+  .modal-overlay { align-items: flex-end; padding: 10px; }
+  .modal-box { width: 100%; max-width: 560px; max-height: min(88dvh, 760px); border-radius: 16px 16px 12px 12px; }
+  .modal-foot { gap: 8px; }
+  .modal-foot .btn { flex: 1 1 100%; }
+  #toast-wrap { top: 66px; left: 12px; right: 12px; }
+  .toast { width: 100%; min-width: 0; }
+  .landing-nav { height: 68px; padding-inline: 16px; gap: 10px; }
+  .landing-nav-cta { white-space: normal; text-align: center; }
+  .hero { grid-template-columns: minmax(0, 1fr); padding: 42px 18px 34px; gap: 28px; }
+  .hero h1 { font-size: clamp(42px, 10vw, 68px); overflow-wrap: anywhere; }
+  .hero-visual { height: clamp(300px, 72vw, 440px); min-height: 0; }
+  .hero-stat { left: 14px; bottom: 45px; width: min(205px, calc(100% - 28px)); padding: 14px; }
+  .hero-stat strong { font-size: clamp(32px, 9vw, 45px); }
+  .image-caption { right: 12px; bottom: 12px; max-width: 48%; text-align: right; }
+  .signal-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 18px; gap: 18px 12px; }
+  .preview-section, .capabilities, .how-section { padding: 54px 18px; }
+  .preview-frame { grid-template-columns: minmax(0, 1fr); min-height: 0; }
+  .preview-main { padding: 12px; }
+  .preview-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .preview-lower { grid-template-columns: minmax(0, 1fr); }
+  .preview-kpi { min-width: 0; }
+  .preview-kpi > small { white-space: normal; line-height: 1.4; }
+  .capability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .capability { min-width: 0; }
+  .how-section { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+  .closing-cta { margin: 0 18px 38px; padding: 26px 20px; flex-direction: column; align-items: flex-start; }
+  .closing-cta .btn { max-width: 100%; white-space: normal; }
+  .landing-footer { padding-inline: 18px; flex-wrap: wrap; }
+}
+
+/* Most phones */
+@media (max-width: 600px) {
+  .page { padding: 14px 12px 32px; }
+  .page-head h1 { font-size: 19px; line-height: 1.25; }
+  .page-head p { font-size: 12px; line-height: 1.55; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .kpi-card { padding: 12px; gap: 7px; }
+  .kpi-icon { width: 30px; height: 30px; }
+  .kpi-value { font-size: clamp(17px, 5vw, 21px); }
+  .kpi-foot { flex-wrap: wrap; line-height: 1.4; }
+  .card { border-radius: 12px; }
+  .card-pad { padding: 13px 12px; }
+  .tab-row { width: 100%; max-width: 100%; overflow-x: auto; }
+  .tab-btn { flex: 0 0 auto; }
+  .site-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .node-card { width: 100%; }
+  .topology-row { flex-direction: column; align-items: stretch; }
+  .flow-row { flex-direction: column; gap: 12px; }
+  .flow-link { width: 3px; min-width: 0; height: 24px; flex: 0 0 24px; }
+  .flow-dot { top: 0; left: 50% !important; transform: translateX(-50%); animation: flowmovev 2.6s linear infinite; }
+  .chart-wrap { height: 190px; }
+  .chart-wrap-sm { height: 150px; }
+  .alerts-table th, .data-table th { padding-inline: 9px; }
+  .alerts-table td, .data-table td { padding: 10px 9px; font-size: 12px; }
+  .login-card { grid-template-columns: minmax(0, 1fr); }
+  .login-form-wrap { padding: 26px 20px; }
+  #screen-login { min-height: 100dvh; padding: 16px; }
+  #screen-sites { padding: 20px 12px; }
+  .sites-top { gap: 12px; }
+  .site-card { padding: 16px; }
+  .status-chip span:not(.dot) { display: none; }
+  .hero h1 { font-size: clamp(40px, 11.5vw, 58px); }
+  .hero-description { font-size: 13px; line-height: 1.75; }
+  .hero-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .hero-actions .btn { width: 100%; }
+  .hero-proof { margin-top: 25px; }
+  .hero-visual { height: 340px; border-bottom-left-radius: 42px; }
+  .photo-tag { top: 14px; left: 14px; }
+  .signal-strip { padding: 16px 14px; }
+  .section-heading h2, .how-intro h2 { font-size: clamp(34px, 9vw, 43px); }
+  .preview-kpi { min-height: 120px; padding: 10px; }
+  .preview-kpi strong { font-size: clamp(19px, 6vw, 24px); }
+  .preview-health { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .capability-grid { grid-template-columns: minmax(0, 1fr); }
+  .capability { min-height: 0; padding: 16px; }
+  .cap-graphic { height: 105px; }
+  .step { grid-template-columns: 26px 36px minmax(0, 1fr); gap: 10px; }
+  .step-icon { width: 36px; height: 36px; }
+  .landing-footer { gap: 12px; }
+}
+
+/* Narrow phones */
+@media (max-width: 390px) {
+  .topbar { padding-inline: 8px; }
+  .crumb { gap: 4px; font-size: 11px; }
+  .crumb b { max-width: 82px; }
+  .topbar-right { gap: 4px; }
+  .icon-btn { width: 30px; height: 30px; }
+  .site-select-btn { max-width: 92px; padding: 6px; }
+  .page { padding-inline: 9px; }
+  .kpi-grid { gap: 7px; }
+  .kpi-card { padding: 10px; }
+  .kpi-label { font-size: 10px; }
+  .kpi-value { font-size: 17px; }
+  .kpi-foot { font-size: 10px; }
+  .card-title { font-size: 13px; }
+  .login-form-wrap { padding: 22px 16px; }
+  .btn { min-height: 40px; padding: 10px 12px; }
+  .hero { padding-inline: 14px; }
+  .hero h1 { font-size: clamp(37px, 11.3vw, 46px); }
+  .hero-visual { height: 310px; }
+  .hero-stat { bottom: 42px; }
+  .signal-strip { grid-template-columns: minmax(0, 1fr); }
+  .preview-section, .capabilities, .how-section { padding-inline: 14px; }
+  .preview-head h3 { font-size: 19px; }
+  .preview-kpis { gap: 6px; }
+  .preview-kpi strong { font-size: 19px; }
+  .closing-cta { margin-inline: 14px; padding: 22px 16px; }
+}
+
+/* Very small devices */
+@media (max-width: 320px) {
+  .kpi-grid, .preview-kpis { grid-template-columns: minmax(0, 1fr); }
+  .topbar-right .status-chip { display: none; }
+  .landing-brand { font-size: 13px; gap: 7px; }
+  .landing-brand small { font-size: 7px; }
+  .brand-symbol { width: 30px; height: 30px; }
+  .landing-nav-cta { max-width: 105px; padding: 8px; font-size: 9px; }
+  .hero h1 { font-size: 36px; }
+}
+
+/* Touch targets, landscape phones, and reduced motion */
+@media (hover: none) and (pointer: coarse) {
+  .nav-item, .btn, .tab-btn, .source-btn, .icon-btn,
+  .site-select-btn, .toggle { touch-action: manipulation; }
+  .nav-item { min-height: 42px; }
+  .btn, .source-btn { min-height: 42px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  #screen-login { min-height: 100dvh; align-items: flex-start; }
+  .login-card { margin-block: 10px; }
+  .login-form-wrap { padding-block: 22px; }
+  .sidebar { overflow-y: auto; }
+  .hero { padding-block: 28px; }
+  .hero-visual { height: 300px; min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
 </style>
 </head>
 <body>
